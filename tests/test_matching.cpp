@@ -20,7 +20,7 @@
 
 // TODO enable both toggles for testing custom detector & matcher
 #define ENABLE_MY_DESCRIPTOR 0
-#define ENABLE_MY_MATCHING 0
+#define ENABLE_MY_MATCHING 1
 #define ENABLE_GPU_BRUTEFORCE_MATCHER 0
 
 #if ENABLE_MY_MATCHING
@@ -277,13 +277,13 @@ namespace {
 
         std::cout << "flann matching..." << std::endl;
         tm.restart();
-        #if ENABLE_MY_MATCHING
+#if ENABLE_MY_MATCHING
         {
             phg::FlannMatcher matcher;
             matcher.train(descriptors2);
             matcher.knnMatch(descriptors1, knn_matches_flann, 2);
         }
-        #endif
+#endif
         time_my = tm.elapsed();
 
         std::cout << "cv flann matching..." << std::endl;
@@ -292,9 +292,9 @@ namespace {
             Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create(DescriptorMatcher::FLANNBASED);
             matcher->knnMatch( descriptors1, descriptors2, knn_matches_flann_cv, 2 );
 
-            #if !ENABLE_MY_MATCHING
+#if !ENABLE_MY_MATCHING
             knn_matches_flann = knn_matches_flann_cv;
-            #endif
+#endif
         }
         time_cv = tm.elapsed();
 
@@ -374,7 +374,7 @@ namespace {
         }
         drawMatches(img1, img2, keypoints1, keypoints2, good_matches_nn, "data/debug/test_matching/" + getTestSuiteName() + "_" + getTestName() + "_" + "00_matches_nn.png");
 
-        #if ENABLE_MY_MATCHING
+#if ENABLE_MY_MATCHING
         std::cout << "filtering matches by ratio test..." << std::endl;
         std::vector<DMatch> good_matches_ratio;
         phg::DescriptorMatcher::filterMatchesRatioTest(knn_matches_flann, good_matches_ratio);
@@ -389,11 +389,11 @@ namespace {
         std::vector<DMatch> good_matches_clusters_and_ratio;
         phg::DescriptorMatcher::filterMatchesClusters(good_matches_ratio, keypoints1, keypoints2, good_matches_clusters_and_ratio);
         drawMatches(img1, img2, keypoints1, keypoints2, good_matches_clusters_and_ratio, "data/debug/test_matching/" + getTestSuiteName() + "_" + getTestName() + "_" + "04_matches_clusters_and_ratio.png");
-        #else
+#else
         std::vector<DMatch> good_matches_clusters_and_ratio;
         phg::filterMatchesGMS(good_matches_nn, keypoints1, keypoints2, img1.size(), img2.size(), good_matches_clusters_and_ratio);
         drawMatches(img1, img2, keypoints1, keypoints2, good_matches_clusters_and_ratio, "data/debug/test_matching/" + getTestSuiteName() + "_" + getTestName() + "_" + "04_matches_gms.png");
-        #endif
+#endif
 
         std::cout << "estimating homography..." << std::endl;
         cv::Mat H;
@@ -418,15 +418,15 @@ namespace {
 
         std::cout << "evaluating homography..." << std::endl;
 
-        #if ENABLE_MY_MATCHING
+#if ENABLE_MY_MATCHING
         const int ntest = 4;
         std::vector<cv::DMatch>* arrs[ntest] = {&good_matches_nn, &good_matches_ratio, &good_matches_clusters_only, &good_matches_clusters_and_ratio};
         double* ptrs[ntest] = {&good_nn, &good_ratio, &good_clusters, &good_ratio_and_clusters};
-        #else
+#else
         const int ntest = 2;
         std::vector<cv::DMatch>* arrs[ntest] = {&good_matches_nn, &good_matches_clusters_and_ratio};
         double* ptrs[ntest] = {&good_nn, &good_ratio_and_clusters};
-        #endif
+#endif
 
         for (int i_test = 0; i_test < ntest; ++i_test) {
 
@@ -465,12 +465,12 @@ namespace {
     }
 
     void testMatching(const cv::Mat &img1, const cv::Mat &img2, const std::vector<cv::KeyPoint> &keypoints1, const std::vector<cv::KeyPoint> &keypoints2,
-                       const cv::Mat &descriptors1, const cv::Mat &descriptors2,
+                      const cv::Mat &descriptors1, const cv::Mat &descriptors2,
                       double &nn_score, double &nn2_score, double &nn_score_cv, double &nn2_score_cv,
                       double &time_my, double &time_cv, double &time_bruteforce, double &time_bruteforce_gpu,
                       double &good_nn, double &good_ratio, double &good_clusters, double &good_ratio_and_clusters,
                       bool do_bruteforce
-                       )
+    )
     {
         evaluateMatching(img1, img2, keypoints1, keypoints2, descriptors1, descriptors2,
                          nn_score, nn2_score, nn_score_cv, nn2_score_cv,
@@ -494,9 +494,9 @@ namespace {
     }
 
     void testMatchingMultipleDetectors(const cv::Mat &img1, const cv::Mat &img2,
-                                        double &nn_score, double &nn2_score, double &nn_score_cv, double &nn2_score_cv,
-                                        double &time_my, double &time_cv, double &time_bruteforce, double &time_bruteforce_gpu,
-                                        double &good_nn, double &good_ratio, double &good_clusters, double &good_ratio_and_clusters, bool do_bruteforce = true)
+                                       double &nn_score, double &nn2_score, double &nn_score_cv, double &nn2_score_cv,
+                                       double &time_my, double &time_cv, double &time_bruteforce, double &time_bruteforce_gpu,
+                                       double &good_nn, double &good_ratio, double &good_clusters, double &good_ratio_and_clusters, bool do_bruteforce = true)
     {
         {
             std::cout << "testing sift detector/descriptor..." << std::endl;
