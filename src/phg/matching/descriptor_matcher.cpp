@@ -47,7 +47,7 @@ void phg::DescriptorMatcher::filterMatchesClusters(const std::vector<cv::DMatch>
 
     // размерность всего 2, так что точное KD-дерево
     std::shared_ptr<cv::flann::IndexParams> index_params = flannKdTreeIndexParams(1); // My param
-    std::shared_ptr<cv::flann::SearchParams> search_params = flannKsTreeSearchParams(40); // My param
+    std::shared_ptr<cv::flann::SearchParams> search_params = flannKsTreeSearchParams(n_matches); // My param
 
     std::shared_ptr<cv::flann::Index> index_query = flannKdTreeIndex(points_query, index_params);
     std::shared_ptr<cv::flann::Index> index_train = flannKdTreeIndex(points_train, index_params);
