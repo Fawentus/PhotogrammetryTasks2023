@@ -18,8 +18,32 @@ namespace {
         copy(Ecv, E);
 
         Eigen::JacobiSVD<Eigen::MatrixXd> svd(E, Eigen::ComputeFullU | Eigen::ComputeFullV);
-        throw std::runtime_error("not implemented yet");
+//        throw std::runtime_error("not implemented yet 3.2");
 // TODO
+        cv::Matx33d
+        U{
+            svd.matrixU()(0, 0), svd.matrixU()(0, 1), svd.matrixU()(0, 2),
+            svd.matrixU()(1, 0), svd.matrixU()(1, 1), svd.matrixU()(1, 2),
+            svd.matrixU()(2, 0), svd.matrixU()(2, 1), svd.matrixU()(2, 2)
+        },
+        D{
+            svd.singularValues()[0], 0, 0,
+            0, svd.singularValues()[0], 0,
+            0, 0, 0
+        },
+        V{
+            svd.matrixV()(0, 0), svd.matrixV()(0, 1), svd.matrixV()(0, 2),
+            svd.matrixV()(1, 0), svd.matrixV()(1, 1), svd.matrixV()(1, 2),
+            svd.matrixV()(2, 0), svd.matrixV()(2, 1), svd.matrixV()(2, 2)
+        }, V_t;
+
+        cv::transpose(V, V_t);
+        cv::Matx33d E_ = U * D * V_t;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++)
+                E(i, j) = E_(i, j);
+        }
 
         copy(E, Ecv);
     }
@@ -28,12 +52,14 @@ namespace {
 
 cv::Matx33d phg::fmatrix2ematrix(const cv::Matx33d &F, const phg::Calibration &calib0, const phg::Calibration &calib1)
 {
-    throw std::runtime_error("not implemented yet");
-//    matrix3d E = TODO;
-//
-//    ensureSpectralProperty(E);
-//
-//    return E;
+//    throw std::runtime_error("not implemented yet 3.1");
+    matrix3d calib1K_t;
+    cv::transpose(calib1.K(), calib1K_t);
+    matrix3d E = calib1K_t * F * calib0.K(); // TODO;
+
+    ensureSpectralProperty(E);
+
+    return E;
 }
 
 namespace {
@@ -61,21 +87,21 @@ namespace {
 
     bool depthTest(const vector2d &m0, const vector2d &m1, const phg::Calibration &calib0, const phg::Calibration &calib1, const matrix34d &P0, const matrix34d &P1)
     {
-        throw std::runtime_error("not implemented yet");
-//        // скомпенсировать калибровки камер
-//        vector3d p0 = TODO;
-//        vector3d p1 = TODO;
-//
-//        vector3d ps[2] = {p0, p1};
-//        matrix34d Ps[2] = {P0, P1};
-//
-//        vector4d X = phg::triangulatePoint(Ps, ps, 2);
-//        if (X[3] != 0) {
-//            X /= X[3];
-//        }
-//
-//        // точка должна иметь положительную глубину для обеих камер
-//        return TODO && TODO;
+//        throw std::runtime_error("not implemented yet 4.3");
+        // скомпенсировать калибровки камер
+        vector3d p0 = calib0.unproject(m0); // TODO;
+        vector3d p1 = calib1.unproject(m1); // TODO;
+
+        vector3d ps[2] = {p0, p1};
+        matrix34d Ps[2] = {P0, P1};
+
+        vector4d X = phg::triangulatePoint(Ps, ps, 2);
+        if (X[3] != 0) {
+            X /= X[3];
+        }
+
+        // точка должна иметь положительную глубину для обеих камер
+        return calib0.project(P0 * X)[2] > 0 && calib0.project(P1 * X)[2] > 0;; // TODO && TODO;
     }
 }
 
@@ -88,80 +114,84 @@ namespace {
 // первичное разложение существенной матрицы (а из него, взаимное расположение камер) для последующего уточнения методом нелинейной оптимизации
 void phg::decomposeEMatrix(cv::Matx34d &P0, cv::Matx34d &P1, const cv::Matx33d &Ecv, const std::vector<cv::Vec2d> &m0, const std::vector<cv::Vec2d> &m1, const Calibration &calib0, const Calibration &calib1)
 {
-    throw std::runtime_error("not implemented yet");
-//    if (m0.size() != m1.size()) {
-//        throw std::runtime_error("decomposeEMatrix : m0.size() != m1.size()");
-//    }
-//
-//    using mat = Eigen::MatrixXd;
-//    using vec = Eigen::VectorXd;
-//
-//    mat E;
-//    copy(Ecv, E);
-//
-//    // (см. Hartley & Zisserman p.258)
-//
-//    Eigen::JacobiSVD<mat> svd(E, Eigen::ComputeFullU | Eigen::ComputeFullV);
-//
-//    mat U = svd.matrixU();
-//    vec s = svd.singularValues();
-//    mat V = svd.matrixV();
-//
-//    // U, V must be rotation matrices, not just orthogonal
-//    if (U.determinant() < 0) U = -U;
-//    if (V.determinant() < 0) V = -V;
-//
-//    std::cout << "U:\n" << U << std::endl;
-//    std::cout << "s:\n" << s << std::endl;
-//    std::cout << "V:\n" << V << std::endl;
-//
-//
-//    mat R0 = TODO;
-//    mat R1 = TODO;
-//
-//    std::cout << "R0:\n" << R0 << std::endl;
-//    std::cout << "R1:\n" << R1 << std::endl;
-//
-//    vec t0 = TODO;
-//    vec t1 = TODO;
-//
-//    std::cout << "t0:\n" << t0 << std::endl;
-//
-//    P0 = matrix34d::eye();
-//
-//    // 4 possible solutions
-//    matrix34d P10 = composeP(R0, t0);
-//    matrix34d P11 = composeP(R0, t1);
-//    matrix34d P12 = composeP(R1, t0);
-//    matrix34d P13 = composeP(R1, t1);
-//    matrix34d P1s[4] = {P10, P11, P12, P13};
-//
-//    // need to select best of 4 solutions: 3d points should be in front of cameras (positive depths)
-//    int best_count = 0;
-//    int best_idx = -1;
-//    for (int i = 0; i < 4; ++i) {
-//        int count = 0;
-//        for (int j = 0; j < (int) m0.size(); ++j) {
-//            if (depthTest(m0[j], m1[j], calib0, calib1, P0, P1s[i])) {
-//                ++count;
-//            }
-//        }
-//        std::cout << "decomposeEMatrix: count: " << count << std::endl;
-//        if (count > best_count) {
-//            best_count = count;
-//            best_idx = i;
-//        }
-//    }
-//
-//    if (best_count == 0) {
-//        throw std::runtime_error("decomposeEMatrix : can't decompose ematrix");
-//    }
-//
-//    P1 = P1s[best_idx];
-//
-//    std::cout << "best idx: " << best_idx << std::endl;
-//    std::cout << "P0: \n" << P0 << std::endl;
-//    std::cout << "P1: \n" << P1 << std::endl;
+//    throw std::runtime_error("not implemented yet 4.1");
+    if (m0.size() != m1.size()) {
+        throw std::runtime_error("decomposeEMatrix : m0.size() != m1.size()");
+    }
+
+    using mat = Eigen::MatrixXd;
+    using vec = Eigen::VectorXd;
+
+    mat E;
+    copy(Ecv, E);
+
+    // (см. Hartley & Zisserman p.258)
+
+    Eigen::JacobiSVD<mat> svd(E, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    mat U = svd.matrixU();
+    vec s = svd.singularValues();
+    mat V = svd.matrixV();
+
+    // U, V must be rotation matrices, not just orthogonal
+    if (U.determinant() < 0) U = -U;
+    if (V.determinant() < 0) V = -V;
+
+    std::cout << "U:\n" << U << std::endl;
+    std::cout << "s:\n" << s << std::endl;
+    std::cout << "V:\n" << V << std::endl;
+
+    mat W(3, 3);
+    W(0, 0) = 0, W(0, 1) = -1, W(0, 2) = 0;
+    W(1, 0) = 1, W(1, 1) = 0, W(1, 2) = 0;
+    W(2, 0) = 0, W(2, 1) = 0, W(2, 2) = 1;
+
+    mat R0 = U * W * V.transpose(); // TODO;
+    mat R1 = U * W.transpose() * V.transpose(); // TODO;
+
+    std::cout << "R0:\n" << R0 << std::endl;
+    std::cout << "R1:\n" << R1 << std::endl;
+
+    vec t0 = U.col(2); // TODO;
+    vec t1 = -U.col(2); // TODO;
+
+    std::cout << "t0:\n" << t0 << std::endl;
+
+    P0 = matrix34d::eye();
+
+    // 4 possible solutions
+    matrix34d P10 = composeP(R0, t0);
+    matrix34d P11 = composeP(R0, t1);
+    matrix34d P12 = composeP(R1, t0);
+    matrix34d P13 = composeP(R1, t1);
+    matrix34d P1s[4] = {P10, P11, P12, P13};
+
+    // need to select best of 4 solutions: 3d points should be in front of cameras (positive depths)
+    int best_count = 0;
+    int best_idx = -1;
+    for (int i = 0; i < 4; ++i) {
+        int count = 0;
+        for (int j = 0; j < (int) m0.size(); ++j) {
+            if (depthTest(m0[j], m1[j], calib0, calib1, P0, P1s[i])) {
+                ++count;
+            }
+        }
+        std::cout << "decomposeEMatrix: count: " << count << std::endl;
+        if (count > best_count) {
+            best_count = count;
+            best_idx = i;
+        }
+    }
+
+    if (best_count == 0) {
+        throw std::runtime_error("decomposeEMatrix : can't decompose ematrix");
+    }
+
+    P1 = P1s[best_idx];
+
+    std::cout << "best idx: " << best_idx << std::endl;
+    std::cout << "P0: \n" << P0 << std::endl;
+    std::cout << "P1: \n" << P1 << std::endl;
 }
 
 void phg::decomposeUndistortedPMatrix(cv::Matx33d &R, cv::Vec3d &O, const cv::Matx34d &P)

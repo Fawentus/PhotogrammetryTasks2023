@@ -1,8 +1,11 @@
+// Этот файлик скопировала из своего task02, заметила его, когда уже лабу сделала, не хотелось мёржить
+
 #include "panorama_stitcher.h"
 #include "homography.h"
 
 #include <libutils/bbox2.h>
 #include <iostream>
+#include <stack>
 
 /*
  * imgs - список картинок
@@ -10,6 +13,8 @@
  *          этот список образует дерево, корень дерева (картинка, которая ни к кому не приклеивается, приклеиваются только к ней), в данном массиве имеет значение -1
  * homography_builder - функтор, возвращающий гомографию по паре картинок
  * */
+
+
 cv::Mat phg::stitchPanorama(const std::vector<cv::Mat> &imgs,
                             const std::vector<int> &parent,
                             std::function<cv::Mat(const cv::Mat &, const cv::Mat &)> &homography_builder)
@@ -23,7 +28,26 @@ cv::Mat phg::stitchPanorama(const std::vector<cv::Mat> &imgs,
     {
         // здесь надо посчитать вектор Hs
         // при этом можно обойтись n_images - 1 вызовами функтора homography_builder
-        throw std::runtime_error("not implemented yet");
+        std::stack<int> stack;
+        std::vector<bool> fl(n_images, false);
+        for (int i = 0; i < n_images; i++) {
+            stack.push(i);
+        }
+        while(!stack.empty()) {
+            int curr = stack.top();
+            if(!fl[curr]) {
+                if(parent[curr] < 0) {
+                    Hs[curr] = cv::Mat::eye(3, 3, CV_64F);
+                } else if(fl[parent[curr]]) {
+                    Hs[curr] = Hs[parent[curr]] * homography_builder(imgs[curr], imgs[parent[curr]]);
+                } else {
+                    stack.push(parent[curr]);
+                    continue;
+                }
+                fl[curr] = true;
+            }
+            stack.pop();
+        }
     }
 
     bbox2<double, cv::Point2d> bbox;
@@ -46,19 +70,19 @@ cv::Mat phg::stitchPanorama(const std::vector<cv::Mat> &imgs,
     // из-за растяжения пикселей при использовании прямой матрицы гомографии после отображения между пикселями остается пустое пространство
     // лучше использовать обратную и для каждого пикселя на итоговвой картинке проверять, с какой картинки он может получить цвет
     // тогда в некоторых пикселях цвет будет дублироваться, но изображение будет непрерывным
-//        for (int i = 0; i < n_images; ++i) {
-//            for (int y = 0; y < imgs[i].rows; ++y) {
-//                for (int x = 0; x < imgs[i].cols; ++x) {
-//                    cv::Vec3b color = imgs[i].at<cv::Vec3b>(y, x);
-//
-//                    cv::Point2d pt_dst = applyH(cv::Point2d(x, y), Hs[i]) - bbox.min();
-//                    int y_dst = std::max(0, std::min((int) std::round(pt_dst.y), result_height - 1));
-//                    int x_dst = std::max(0, std::min((int) std::round(pt_dst.x), result_width - 1));
-//
-//                    result.at<cv::Vec3b>(y_dst, x_dst) = color;
-//                }
-//            }
-//        }
+    for (int i = 0; i < n_images; ++i) {
+        for (int y = 0; y < imgs[i].rows; ++y) {
+            for (int x = 0; x < imgs[i].cols; ++x) {
+                cv::Vec3b color = imgs[i].at<cv::Vec3b>(y, x);
+
+                cv::Point2d pt_dst = /*applyH*/phg::transformPoint(cv::Point2d(x, y), Hs[i]) - bbox.min();
+                int y_dst = std::max(0, std::min((int) std::round(pt_dst.y), result_height - 1));
+                int x_dst = std::max(0, std::min((int) std::round(pt_dst.x), result_width - 1));
+
+                result.at<cv::Vec3b>(y_dst, x_dst) = color;
+            }
+        }
+    }
 
     std::vector<cv::Mat> Hs_inv;
     std::transform(Hs.begin(), Hs.end(), std::back_inserter(Hs_inv), [&](const cv::Mat &H){ return H.inv(); });

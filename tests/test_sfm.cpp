@@ -18,7 +18,7 @@
 #include "utils/test_utils.h"
 
 
-#define ENABLE_MY_SFM 0
+#define ENABLE_MY_SFM 1
 
 namespace {
 
@@ -113,6 +113,7 @@ namespace {
 EXPECT_FALSE(phg::epipolarTest(pt0, pt1, F, std::max(0.0, t - eps))); \
 EXPECT_TRUE(phg::epipolarTest(pt0, pt1, F, t + eps));
 
+// 1
 TEST (SFM, EpipolarDist) {
 
 #if !ENABLE_MY_SFM
@@ -202,6 +203,7 @@ TEST (SFM, EpipolarDist) {
     }
 }
 
+// 2
 TEST (SFM, FmatrixSimple) {
 
 #if !ENABLE_MY_SFM
@@ -222,6 +224,7 @@ TEST (SFM, FmatrixSimple) {
     EXPECT_TRUE(checkFmatrixSpectralProperty(Fcv));
 }
 
+// 3
 TEST (SFM, EmatrixSimple) {
 
 #if !ENABLE_MY_SFM
@@ -244,6 +247,7 @@ TEST (SFM, EmatrixSimple) {
     EXPECT_TRUE(checkEmatrixSpectralProperty(E));
 }
 
+// 4
 TEST (SFM, EmatrixDecomposeSimple) {
 
 #if !ENABLE_MY_SFM
@@ -301,6 +305,7 @@ TEST (SFM, EmatrixDecomposeSimple) {
     EXPECT_LT(rms3, eps);
 }
 
+// 5
 TEST (SFM, TriangulationSimple) {
 
 #if !ENABLE_MY_SFM
@@ -350,6 +355,7 @@ TEST (SFM, TriangulationSimple) {
     EXPECT_LT(cv::norm(d), eps);
 }
 
+// 6
 TEST (SFM, FmatrixMatchFiltering) {
 
 #if !ENABLE_MY_SFM
@@ -425,6 +431,7 @@ TEST (SFM, FmatrixMatchFiltering) {
     EXPECT_GT(good_matches_gms_plus_f.size(), 0.5 * good_matches_f.size());
 }
 
+// 7
 TEST (SFM, RelativePosition2View) {
 
 #if !ENABLE_MY_SFM
@@ -525,6 +532,7 @@ TEST (SFM, RelativePosition2View) {
     phg::exportPointCloud(point_cloud, "data/debug/test_sfm/point_cloud_2_cameras.ply", point_cloud_colors);
 }
 
+// 8
 TEST (SFM, Resection) {
 
 #if !ENABLE_MY_SFM
@@ -627,6 +635,7 @@ namespace {
 
 }
 
+// 9
 TEST (SFM, ReconstructNViews) {
 
 #if !ENABLE_MY_SFM
