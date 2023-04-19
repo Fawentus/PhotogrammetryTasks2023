@@ -33,6 +33,7 @@ namespace phg {
                   cameras_labels(cameras_labels), cameras_PtoLocal(cameras_P),
                   calibration(calibration)
         {
+            cameras_0.resize(ncameras);
             cameras_PtoWorld.resize(ncameras);
             cameras_RtoWorld.resize(ncameras);
 
@@ -50,6 +51,9 @@ namespace phg {
 
                 cameras_PtoWorld[ci] = invP(cameras_PtoLocal[ci]);
                 cameras_RtoWorld[ci] = extractR(cameras_PtoWorld[ci]);
+                cameras_0[ci] = vector3d(cameras_PtoWorld[ci](0, 3),
+                                         cameras_PtoWorld[ci](1, 3),
+                                         cameras_PtoWorld[ci](2, 3));
             }
         }
 
@@ -86,8 +90,8 @@ namespace phg {
         const std::vector<std::string>      &cameras_labels;
 
         const std::vector<matrix34d>        &cameras_PtoLocal; // матрица переводящая глобальную систему координат мира в систему координат i-ой камеры (смотрящей по оси +Z)
-        std::vector<matrix34d>               cameras_PtoWorld; // матрица переводящая локальную систему координат i-ой камеры (смотрящей по оси +Z) в глобальную систему координат мира
-        std::vector<matrix3d>                cameras_RtoWorld; // матрица поворота из локальной системы координат i-ой камеры (смотрящей по оси +Z) в нлобальную систему координат мира
+        std::vector<matrix34d>              cameras_PtoWorld; // матрица переводящая локальную систему координат i-ой камеры (смотрящей по оси +Z) в глобальную систему координат мира
+        std::vector<matrix3d>               cameras_RtoWorld; // матрица поворота из локальной системы координат i-ой камеры (смотрящей по оси +Z) в нлобальную систему координат мира
 
         const phg::Calibration              &calibration;
         
@@ -101,7 +105,7 @@ namespace phg {
         
         int                                 iter; // номер итерации
 
-        
+        std::vector<vector3d>               cameras_0; // центр камер
     };
     
 }
