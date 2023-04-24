@@ -1,4 +1,4 @@
-Решила для всех датасетов построить много карт глубины и сохранить их облака точек (TEST (test_depth_maps_pm, AllDepthMaps)). Тут я поняла, почему мы так много врмени уделяли оптимизации по времени, например, на датасете "temple47" работало почти 9 часов.
+Решила для всех датасетов построить много карт глубины и сохранить их облака точек (TEST (test_depth_maps_pm, AllDepthMaps)). Тут я поняла, почему мы так много врмени уделяли оптимизации по времени, например, на датасете `temple47` работало почти 9 часов.
 
 ## saharov32
 
@@ -661,7 +661,10 @@ Process finished with exit code 0
 
 </p></details>
 
-TODO картики
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_saharov32/4.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_saharov32/2.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_saharov32/3.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_saharov32/1.png)
 
 ## temple47
 
@@ -1633,7 +1636,11 @@ Process finished with exit code 0
 
 </p></details>
 
-TODO картики
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_temple47/1.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_temple47/2.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_temple47/4.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_temple47/5.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_temple47/6.png)
 
 ## herzjesu25
 
@@ -2142,4 +2149,6 @@ Process finished with exit code 0
 
 </p></details>
 
-TODO картики
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_herzjesu25/1.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_herzjesu25/3.png)
+![](https://github.com/Fawentus/PhotogrammetryTasks2023/blob/task05/res_herzjesu25/4.png)
